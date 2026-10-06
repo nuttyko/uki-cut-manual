@@ -9,23 +9,15 @@
 
 // grid は画面の3×3の並び順(左上→右下)。"base" は中央の赤いタイル。
 window.STYLES = [
-  { id: "bob", name: "BOB",  variants: ["S", "M", "L"],  desc: "S / M / L", define: "S / M / L はレングス(長さ)。" },
-  { id: "ls",  name: "LS",   variants: [],               desc: "上が長く、下が短い", define: "上の方が長く、下の方が短いスタイル。" },
-  { id: "ms",  name: "MS",   variants: ["1", "2"],       desc: "段差 1 / 2", define: "数字(1 / 2)で段差の付き方が変わる。" },
-  { id: "ss",  name: "SS",   variants: ["1", "2"],       desc: "段差 1 / 2", define: "数字(1 / 2)で段差の付き方が変わる。" },
+  { id: "bob", name: "BOB",  variants: ["S", "M", "L"],  desc: "S / M / L" },
+  { id: "ls",  name: "LS",   variants: [],               desc: "上が長く、下が短い" },
+  { id: "ms",  name: "MS",   variants: ["1", "2"],       desc: "段差 1 / 2" },
+  { id: "ss",  name: "SS",   variants: ["1", "2"],       desc: "段差 1 / 2" },
   { id: "base", name: "U2Cベーススタイルの把握", variants: [], desc: "最初に見る基本", base: true },
   { id: "ll",  name: "LL",   variants: ["M", "L"],       desc: "レングス M / L" },
   { id: "ml",  name: "ML",   variants: ["M", "L"],       desc: "レングス M / L" },
-  { id: "sl",  name: "SL",   variants: ["M", "L"],       desc: "上が短く、下が長い", define: "上の方が短く、下の方が長いスタイル。カッコ内のM / Lはレングス(長さ)。" },
+  { id: "sl",  name: "SL",   variants: ["M", "L"],       desc: "上が短く、下が長い" },
   { id: "two", name: "ツーブロック等 変形スタイル", variants: [], desc: "変形スタイル" },
-];
-
-// 用語の定義(ホームの「用語の定義」に表示)。増やすときは1行足すだけ。
-window.GLOSSARY = [
-  { term: "LS", text: "上の方が長く、下の方が短いスタイル。" },
-  { term: "SL", text: "上の方が短く、下の方が長いスタイル。" },
-  { term: "1 / 2", text: "段差の付き方の違い。数字でレッスン内容が変わる。" },
-  { term: "S / M / L", text: "レングス(長さ)。" },
 ];
 
 window.LESSONS = [

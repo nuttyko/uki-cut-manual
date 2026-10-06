@@ -85,8 +85,8 @@ function home(q=''){
     res.innerHTML = '<div class="grid">' + STYLES.map(s => {
       const n = lessonsOf(s.id).length;
       const go = s.base ? '#/lesson/base-00' : '#/style/'+s.id;
-      return `<div class="card ${s.base?'base':''}" onclick="location.hash='${go}'"><b>${esc(s.name)}</b>${s.base?'':`<span>${esc(s.desc)}</span>`}</div>`;
-    }).join('') + '</div><h2>用語の定義</h2><dl class="gl">' + GLOSSARY.map(g=>`<dt>${esc(g.term)}</dt><dd>${esc(g.text)}</dd>`).join('') + '</dl>';
+      return `<div class="card ${s.base?'base':''}" onclick="location.hash='${go}'"><b>${esc(s.name)}</b></div>`;
+    }).join('') + '</div>';
   }
   const input = document.getElementById('q');
   input.addEventListener('input', e => { const v=e.target.value.trim(); home(v); const i=document.getElementById('q'); i.focus(); i.setSelectionRange(i.value.length,i.value.length); });
@@ -97,7 +97,7 @@ function rowHtml(l){
 }
 function styleView(id){
   const s = styleOf(id); if(!s) return home();
-  $app.innerHTML = `<button class="back" onclick="location.hash=''">‹ スタイル一覧</button><h1>${esc(s.name)}</h1>${s.define?`<div class="def">${esc(s.define)}</div>`:''}` +
+  $app.innerHTML = `<button class="back" onclick="location.hash=''">‹ スタイル一覧</button><h1>${esc(s.name)}</h1>` +
     (lessonsOf(id).map(rowHtml).join('') || '<p class="empty">レッスン準備中です</p>');
 }
 function lessonView(id){
