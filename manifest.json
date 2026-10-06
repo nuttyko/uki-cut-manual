@@ -1,0 +1,9 @@
+{
+  "name": "ウキウキ倶楽部 カットマニュアル",
+  "short_name": "カット",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#ffffff",
+  "icons": [{ "src": "logo.jpg", "sizes": "any", "type": "image/jpeg" }]
+}

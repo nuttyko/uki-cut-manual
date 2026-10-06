@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#ffffff">
+<title>ウキウキ倶楽部 カットマニュアル</title>
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="logo.jpg">
+<style>
+:root{
+  --bg:#f5f5f6; --card:#fff; --ink:#222; --sub:#7a7d82; --line:#e4e5e7;
+  --accent:#e60012; --r:14px;
+}
+*{box-sizing:border-box;margin:0}
+body{background:var(--bg);color:var(--ink);font-family:-apple-system,"Hiragino Sans","Noto Sans JP",sans-serif;line-height:1.7;-webkit-text-size-adjust:100%}
+header{background:#fff;border-bottom:1px solid var(--line);position:sticky;top:0;z-index:5;padding-top:env(safe-area-inset-top)}
+.bar{max-width:760px;margin:0 auto;padding:10px 16px;display:flex;align-items:center;gap:12px}
+.bar img{height:34px;cursor:pointer}
+.bar .t{font-size:13px;color:var(--sub);letter-spacing:.05em}
+main{max-width:760px;margin:0 auto;padding:20px 16px 80px}
+h1{font-size:20px;margin:6px 0 14px}
+h2{font-size:15px;margin:22px 0 8px}
+input[type=search]{width:100%;padding:12px 14px;border:1px solid var(--line);border-radius:var(--r);font-size:16px;background:#fff;margin-bottom:16px}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.card{display:flex;flex-direction:column;justify-content:center;text-align:center;min-height:104px;padding:10px 6px}
+.card.base{background:var(--accent);border-color:var(--accent);color:#fff}
+.card.base span,.card.base em{color:#fff}
+.card.done{border-color:#222}
+.card{background:var(--card);border-radius:var(--r);padding:16px;border:1px solid var(--line);cursor:pointer}
+.card:active{background:#fafafa}
+.card b{display:block;font-size:15px;line-height:1.35}
+.card span{font-size:11px;color:var(--sub);margin-top:4px}
+.card em{font-style:normal;font-size:12px;color:var(--accent);display:block;margin-top:6px}
+.row{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:14px 16px;margin-bottom:10px;cursor:pointer;display:flex;gap:12px;align-items:center}
+.row .tt{flex:1;font-size:15px;font-weight:600}
+.row small{color:var(--sub);font-size:12px;display:block;font-weight:400}
+.tag{font-size:11px;padding:2px 9px;border-radius:99px;background:#ececee;color:#555;white-space:nowrap}
+.tag.adv{background:#222;color:#fff}
+.back{background:none;border:0;color:var(--sub);font-size:14px;padding:4px 0;cursor:pointer}
+.video{position:relative;aspect-ratio:16/9;background:#2a2b2e;border-radius:var(--r);overflow:hidden}
+.video iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
+.video .none{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:#aaa;font-size:14px}
+ol{padding-left:22px}
+ol li{margin-bottom:8px}
+ul.pt{list-style:none;padding:0}
+ul.pt li{background:#fff;border:1px solid var(--line);border-left:3px solid var(--accent);border-radius:8px;padding:8px 12px;margin-bottom:8px;font-size:14px}
+.nav{display:flex;gap:10px;margin-top:24px}
+.btn{flex:1;padding:14px;border-radius:var(--r);border:1px solid var(--line);background:#fff;font-size:14px;text-align:center;cursor:pointer}
+.btn.dark{background:#222;color:#fff;border-color:#222}
+.def{background:#fff;border:1px solid var(--line);border-radius:var(--r);padding:12px 14px;font-size:14px;margin-bottom:14px;color:#444}
+.gl dt{font-weight:700;margin-top:10px}.gl dd{margin:0;color:#444;font-size:14px}
+.empty{color:var(--sub);text-align:center;padding:30px 0}
+</style>
+</head>
+<body>
+<header><div class="bar"><img src="logo.jpg" alt="U2C ウキウキ倶楽部" onclick="location.hash=''"><span class="t">CUT MANUAL</span></div></header>
+<main id="app"></main>
+
+<script src="lessons.js"></script>
+<script>
+const $app = document.getElementById('app');
+const esc = s => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const styleOf = id => STYLES.find(s => s.id === id);
+const lessonsOf = id => LESSONS.filter(l => l.style === id);
+
+// GoogleドライブのURLを埋め込み用に変換
+function driveEmbed(url){
+  const m = url && url.match(/\/d\/([\w-]+)/) || url && url.match(/[?&]id=([\w-]+)/);
+  return m ? `https://drive.google.com/file/d/${m[1]}/preview` : '';
+}
+const levelTag = l => `<span class="tag ${l==='応用'?'adv':''}">${esc(l)}</span>`;
+
+function home(q=''){
+  const hits = q ? LESSONS.filter(l => (l.title+l.steps.join('')+l.points.join('')).includes(q)) : [];
+  $app.innerHTML = `
+    <h1>レッスンを探す</h1>
+    <input type="search" id="q" placeholder="キーワードで検索(例:ガイドライン)" value="${esc(q)}">
+    <div id="res"></div>`;
+  const res = document.getElementById('res');
+  if(q){
+    res.innerHTML = hits.length ? hits.map(rowHtml).join('') : '<p class="empty">見つかりませんでした</p>';
+  }else{
+    res.innerHTML = '<div class="grid">' + STYLES.map(s => {
+      const n = lessonsOf(s.id).length;
+      const go = s.base ? '#/lesson/base-00' : '#/style/'+s.id;
+      return `<div class="card ${s.base?'base':''}" onclick="location.hash='${go}'"><b>${esc(s.name)}</b>${s.base?'':`<span>${esc(s.desc)}</span>`}</div>`;
+    }).join('') + '</div><h2>用語の定義</h2><dl class="gl">' + GLOSSARY.map(g=>`<dt>${esc(g.term)}</dt><dd>${esc(g.text)}</dd>`).join('') + '</dl>';
+  }
+  const input = document.getElementById('q');
+  input.addEventListener('input', e => { const v=e.target.value.trim(); home(v); const i=document.getElementById('q'); i.focus(); i.setSelectionRange(i.value.length,i.value.length); });
+}
+function rowHtml(l){
+  return `<div class="row" onclick="location.hash='#/lesson/${l.id}'">
+    <div class="tt">${esc(l.title)}<small>${l.video?'動画あり':'動画準備中'}</small></div></div>`;
+}
+function styleView(id){
+  const s = styleOf(id); if(!s) return home();
+  $app.innerHTML = `<button class="back" onclick="location.hash=''">‹ スタイル一覧</button><h1>${esc(s.name)}</h1>${s.define?`<div class="def">${esc(s.define)}</div>`:''}` +
+    (lessonsOf(id).map(rowHtml).join('') || '<p class="empty">レッスン準備中です</p>');
+}
+function lessonView(id){
+  const l = LESSONS.find(x => x.id === id); if(!l) return home();
+  const list = l.style==='base'?LESSONS:lessonsOf(l.style), i = list.indexOf(l);
+  const embed = driveEmbed(l.video);
+  $app.innerHTML = `
+    <button class="back" onclick="location.hash='${l.style==='base'?'':'#/style/'+l.style}'">‹ ${l.style==='base'?'スタイル一覧':esc(styleOf(l.style).name)}</button>
+    <h1>${esc(l.title)}</h1>
+    <div class="video">${embed?`<iframe src="${embed}" allow="autoplay; fullscreen" allowfullscreen></iframe>`:'<div class="none">動画は準備中です</div>'}</div>
+    
+    <h2>手順</h2>${l.steps.length?`<ol>${l.steps.map(s=>`<li>${esc(s)}</li>`).join('')}</ol>`:'<p class="empty">手順テキストは準備中です</p>'}
+    ${l.points.length?`<h2>見るポイント</h2><ul class="pt">${l.points.map(s=>`<li>${esc(s)}</li>`).join('')}</ul>`:''}
+    <div class="nav">
+      ${i>0?`<div class="btn" onclick="location.hash='#/lesson/${list[i-1].id}'">‹ 前のレッスン</div>`:''}
+      ${i<list.length-1?`<div class="btn dark" onclick="location.hash='#/lesson/${list[i+1].id}'">次のレッスン ›</div>`:''}
+    </div>`;
+}
+function route(){
+  const [, type, id] = location.hash.split('/');
+  if(type==='style') styleView(id); else if(type==='lesson') lessonView(id); else home();
+  window.scrollTo(0,0);
+}
+window.addEventListener('hashchange', route);
+route();
+</script>
+</body>
+</html>
