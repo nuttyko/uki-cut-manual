@@ -1,48 +1,91 @@
-// ===== レッスンデータ =====
-// 動画を追加するときは、lessons の中に1件ぶん { ... }, を足すだけです。
-//   id       : 重複しない英数字(第2段階の提出・進行状況で使います。後から変えないこと)
-//   style    : styles の id
-//   variant  : スタイル内の分類(例 "S" "1")。無ければ省略
-//   video    : GoogleドライブのURL(共有設定は「リンクを知っている全員が閲覧可」)。未完成なら ""
-//   steps    : 手順テキスト(ナレーション原稿と同じ内容)
-//   points   : 見てほしいポイント(手元・立ち位置など)
+// ===== CUT CODE 内容データ =====
+// 曼荼羅(3×3)の入れ子構造です。
+//   G(id, 名前, [子...])  … 中にさらに項目がある枠(3×3の画面になる)
+//   L(名前, {video, steps, points}) … 一番下のレッスン(動画画面になる)
+//   R(id)                 … 別の場所にある枠へのリンク(同じ枠を2か所に出したいとき)
+//
+// 動画を足すとき:  L("LS", { video: "GoogleドライブのURL" })
+//   共有設定は「リンクを知っている全員が閲覧可」。未完成なら video は省略。
+//   steps  : 手順テキスト(["…", "…"])  ※公開サイトに出るので、載せてよい内容だけ
+//   points : 見るポイント(["…", "…"])
+//
+// 項目の id は自動で「親のid-順番」になります(第2段階の提出・進行状況で使います)。
+// 並べ替えると id が変わるので、あとから順番を入れ替えないでください。
+// 入れ替えたくなる場合は、L の第2引数に { id: "固定したい名前" } を付けます。
 
-// grid は画面の3×3の並び順(左上→右下)。"base" は中央の赤いタイル。
-window.STYLES = [
-  { id: "bob", name: "BOB",  variants: ["S", "M", "L"],  desc: "S / M / L" },
-  { id: "ls",  name: "LS",   variants: [],               desc: "上が長く、下が短い" },
-  { id: "ms",  name: "MS",   variants: ["1", "2"],       desc: "段差 1 / 2" },
-  { id: "ss",  name: "SS",   variants: ["1", "2"],       desc: "段差 1 / 2" },
-  { id: "base", name: "U2Cベーススタイルの把握", variants: [], desc: "最初に見る基本", base: true },
-  { id: "ll",  name: "LL",   variants: ["M", "L"],       desc: "レングス M / L" },
-  { id: "ml",  name: "ML",   variants: ["M", "L"],       desc: "レングス M / L" },
-  { id: "sl",  name: "SL",   variants: ["M", "L"],       desc: "上が短く、下が長い" },
-  { id: "two", name: "ツーブロック等 変形スタイル", variants: [], desc: "変形スタイル" },
+const L = (name, o = {}) => ({ name, ...o });
+const G = (id, name, children, o = {}) => ({ id, name, children, ...o });
+const R = id => ({ ref: id });
+
+// ベーススタイル8種(「把握」と「習得」で同じ並びを使う)
+const baseStyles = (idp, lastName) => [
+  G(idp + "bob", "BOB", [L("BOB(S)"), L("BOB(M)"), L("BOB(L)")]),
+  L("LS"),
+  G(idp + "ms", "MS", [L("MS(1)"), L("MS(2)")]),
+  G(idp + "ss", "SS", [L("SS(1)"), L("SS(2)")]),
+  G(idp + "ll", "LL", [L("LL(M)"), L("LL(L)")]),
+  G(idp + "ml", "ML", [L("ML(M)"), L("ML(L)")]),
+  G(idp + "sl", "SL", [L("SL(M)"), L("SL(L)")]),
+  L(lastName),
 ];
 
-window.LESSONS = [
-  {
-    id: "base-00",
-    style: "base",
-    title: "U2Cベーススタイルの把握",
-    video: "",
-    minutes: 0,
-    steps: [],
-    points: [],
-  },
-  { id: "bob-s", style: "bob", variant: "S", title: "BOB(S)", video: "", steps: [], points: [] },
-  { id: "bob-m", style: "bob", variant: "M", title: "BOB(M)", video: "", steps: [], points: [] },
-  { id: "bob-l", style: "bob", variant: "L", title: "BOB(L)", video: "", steps: [], points: [] },
-  { id: "ls-01", style: "ls", title: "LS", video: "", steps: [], points: [] },
-  { id: "ms-1", style: "ms", variant: "1", title: "MS(1)", video: "", steps: [], points: [] },
-  { id: "ms-2", style: "ms", variant: "2", title: "MS(2)", video: "", steps: [], points: [] },
-  { id: "ss-1", style: "ss", variant: "1", title: "SS(1)", video: "", steps: [], points: [] },
-  { id: "ss-2", style: "ss", variant: "2", title: "SS(2)", video: "", steps: [], points: [] },
-  { id: "ll-m", style: "ll", variant: "M", title: "LL(M)", video: "", steps: [], points: [] },
-  { id: "ll-l", style: "ll", variant: "L", title: "LL(L)", video: "", steps: [], points: [] },
-  { id: "ml-m", style: "ml", variant: "M", title: "ML(M)", video: "", steps: [], points: [] },
-  { id: "ml-l", style: "ml", variant: "L", title: "ML(L)", video: "", steps: [], points: [] },
-  { id: "sl-m", style: "sl", variant: "M", title: "SL(M)", video: "", steps: [], points: [] },
-  { id: "sl-l", style: "sl", variant: "L", title: "SL(L)", video: "", steps: [], points: [] },
-  { id: "two-01", style: "two", title: "ツーブロック等 変形スタイル", video: "", steps: [], points: [] },
+// カウンセリング共通の8項目
+const counseling = () => [
+  L("ご希望を聞き出す"), L("現状の把握(過去の履歴)"), L("毛髪診断"),
+  L("お客様の来店周期"), L("NGを把握"),
+  L("料金提示"), L("終了時間のお知らせ"), L("仕上がりの確認/アフターカウンセリング"),
 ];
+
+window.ROOT = G("root", "CUT CODE", [
+  G("cb", "カット＆ブロー", [
+    G("cut", "U2Cカットの基本", [
+      L("カット技術とは"), L("ハサミの開閉"), L("カットフォーム"),
+      L("立ち位置の大切さ"), L("角度の大切さ"),
+      L("理解しておくべき用語"), L("長さ(cm)の把握"), L("基本タイムの把握"),
+    ]),
+    G("blow", "U2Cブローの基本", [
+      L("U2Cが提供するブローとは"), L("(1)ラフドライ"), L("(2)フィンガーブロー"),
+      L("(3)TOOL WORK"), L("(4)フィニッシュ"),
+      L("(5)スタイリングとスタイリング剤"), L("TOOLの使いこなし"), L("セットの習得"),
+    ]),
+    G("base", "U2Cベーススタイルの把握", baseStyles("base-", "ツーブロック等 変形スタイル")),
+    G("master", "U2Cベーススタイルのカット＆ブロー習得", baseStyles("master-", "F 刈り上げツーブロック等")),
+    G("bang", "前髪のパターンと作り方", [
+      L("髪質・毛量・クセの把握"), L("造形学・似合わせ"), L("セクショニング(奥行き・幅)"),
+      L("サイドとの繋がり"), L("薄めバング"),
+      L("厚めバング"), L("流すバング"), L("ダブルバング/ディスコネバング"),
+    ]),
+    G("texture", "質感調整", [
+      L("ビジュアル分析と日々のスタイリング方法の共有"), L("髪質・毛量・毛流の把握"), L("ベーススタイルの特性を理解"),
+      L("ゾーン＆セクションの理解"), L("セニングシザーの目的・特徴・注意点"),
+      L("ベースカットに合わせたセニングの入れ方(向き・深さ・角度)"),
+      L("ブラントカット/チョップカット/スライドカットの使い分け"),
+      L("スタイリング剤の選択(質感チェンジ)"),
+    ]),
+    G("apply", "カットの応用", [
+      L("工程の短縮化(スピードアップ)/オーバーダイレクションの取り入れ"),
+      L("似合わせ理論"), L("再現性・持続性の追求"),
+      L("髪質・毛量に合わせたカット技法"), L("カットミスの修正法"),
+      L("スタイリング剤の選択・つけ方"), L("ディスコネクション・セクショニングカットの習得"),
+      L("来店サイクルに合わせた将来のスタイルに向けたカット技法"),
+    ]),
+    R("reset"),
+  ]),
+  G("reset", "リセッター", [
+    L("①リセッター理論"), L("②毛髪診断"), L("③カウンセリング"),
+    L("④リセッティング"), L("⑤プレスシェープ"),
+    L("⑥ポインティング"), L("⑦初回アプローチトーク"), L("⑧リピートトーク"),
+  ]),
+  G("couns", "カウンセリング", [
+    G("couns-cut", "カットカウンセリング", counseling()),
+    G("couns-color", "カラーカウンセリング", counseling()),
+    G("couns-perm", "パーマカウンセリング", counseling()),
+  ]),
+  G("set", "U2Cセット", [
+    L("セットスタイルのバリエーションの把握と見え方の印象把握"),
+    L("毛量・毛の長さに合わせた土台作りの設計図の把握"),
+    L("くくる"),
+    L("とめる"), L("面を見せる"),
+    L("編み込み(表面)"), L("散らすほぐす(表面)"), L("顔周りアレンジ"),
+  ]),
+]);
